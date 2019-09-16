@@ -48,8 +48,7 @@
                          width="120">
         </el-table-column>
         <el-table-column prop="mg_state"
-                         label="状态"
-                         width="150">
+                         label="状态">
           <template v-slot="userState">
             <el-switch v-model="userState.row.mg_state"
                        active-color="#13ce66"
@@ -58,16 +57,18 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
-          <template v-slot='userId'>
+        <el-table-column label="操作"
+                         width="190">
+          <template v-slot='user'>
             <el-button type="primary"
                        icon="el-icon-edit"
                        size='mini'
-                       @click="userAlt(userId.row.id)"></el-button>
+                       @click="userAlt(user.row.id)">
+            </el-button>
             <el-button type="danger"
                        icon="el-icon-delete"
                        size='mini'
-                       @click='userDel(userId.row.id)'>
+                       @click='userDel(user.row.id)'>
             </el-button>
             <el-tooltip class="item"
                         effect="dark"
@@ -76,7 +77,8 @@
                         placement="top">
               <el-button type="warning"
                          icon="el-icon-set-up"
-                         size='mini'></el-button>
+                         size='mini'
+                         @click='getRol(user.row)'></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -155,6 +157,37 @@
                    @click="addUser">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配用户角色对话框 -->
+    <el-dialog title="分配角色"
+               :visible.sync="disDialogVisible"
+               width="50%"
+               @close='reDisRolInfo'>
+      <div>
+        <p class='disRolSty'>
+          当前用户名：{{disRolInfo.userName}}
+        </p>
+        <p class='disRolSty'>
+          当前用户角色：{{disRolInfo.userRole}}
+        </p>
+        <p class='disRolSty'>
+          分配新角色:
+          <el-select v-model="disRolInfo.roleId"
+                     placeholder="请选择">
+            <el-option v-for="item in rolList"
+                       :label="item.roleName"
+                       :key="item.id"
+                       :value="item.id">
+            </el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer"
+            class="dialog-footer">
+        <el-button @click="disDialogVisible = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="disRol">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -186,6 +219,7 @@ export default {
       tableData: [], // 表格数据
       total: 1,
       addDialogVisible: false, // 添加用户信息对话框可见
+      disDialogVisible: false, // 分配角色对话框是否显示
       altDialogVisible: false, // 修改用户信息对话框可见
       userAddForm: {
         username: '',
@@ -227,7 +261,16 @@ export default {
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
           { validator: checkPhone, trigger: 'blur' }]
-      }
+      },
+      // 分配角色对话框显示的信息
+      disRolInfo: {
+        userId: '',
+        userName: '',
+        userRole: '',
+        roleId: ''
+      },
+      // 请求角色列表
+      rolList: []
     }
   },
   created () {
@@ -342,7 +385,40 @@ export default {
           })
         }
       })
+    },
+    // 获取用户角色列表
+    async getRol (userInfo) {
+      this.disDialogVisible = true
+      this.disRolInfo.userName = userInfo.username
+      this.disRolInfo.userRole = userInfo.role_name
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200) {
+        return this.$message.error('请求角色列表失败！')
+      }
+      this.rolList = res.data
+      this.disRolInfo.userId = userInfo.id
+      // console.log(userInfo.id)
+    },
+    // 分配角色
+    async disRol () {
+      const { data: res } = await this.$http.put(`users/${this.disRolInfo.userId}/role`, { rid: this.disRolInfo.roleId })
+      // console.log(res, this.disRolInfo.userId, this.disRolInfo.roleId)
+      if (res.meta.status !== 200) {
+        return this.$message.error('修改失败！')
+      }
+      this.$message.success('修改成功！')
+      this.disDialogVisible = false
+      this.getUserList()
+      // console.log(this.disRolInfo)
+    },
+    reDisRolInfo () {
+      this.disRolInfo = {}
     }
   }
 }
 </script>
+<style scoped lang="scss">
+.disRolSty {
+  margin-bottom: 10px;
+}
+</style>

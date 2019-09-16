@@ -21,6 +21,7 @@ body,
 
 .el-card {
   box-shadow: 0px 0px 5px #ccc !important;
+  min-width: 900px;
 }
 
 .el-table {
