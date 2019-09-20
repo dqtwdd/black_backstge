@@ -83,4 +83,5 @@ vueRouter.beforeEach((to, from, next) => {
     }
   }
 })
+
 export default vueRouter

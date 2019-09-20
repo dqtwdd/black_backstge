@@ -27,7 +27,7 @@
             <el-tag type='success'
                     v-else-if="rightsLev.row.level ==='1'">二级</el-tag>
             <el-tag type='warning'
-                    v-else>二级</el-tag>
+                    v-else>三级</el-tag>
           </template>
         </el-table-column>
       </el-table>

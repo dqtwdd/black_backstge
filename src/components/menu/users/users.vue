@@ -50,6 +50,7 @@
         <el-table-column prop="mg_state"
                          label="状态">
           <template v-slot="userState">
+            <div>{{userState.row.mg_state}}</div>
             <el-switch v-model="userState.row.mg_state"
                        active-color="#13ce66"
                        inactive-color="#ccc"
@@ -367,7 +368,7 @@ export default {
     },
     // 修改表格关闭清空
     reAltForm () {
-      this.$refs.userAddForm.resetFields()
+      this.$refs.userAltForm.resetFields()
     },
     // 修改用户信息
     altUser () {

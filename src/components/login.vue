@@ -102,8 +102,7 @@ $gary: #2b4b6b;
   transform: translate(-50%, -50%);
   top: 50%;
   left: 50%;
-  padding-left: 40px;
-  padding-right: 40px;
+  padding: 0 40px;
   .btn {
     display: flex;
     flex-direction: row-reverse;
